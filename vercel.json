@@ -1,5 +1,8 @@
 {
   "framework": "nextjs",
   "buildCommand": "npm run build",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "env": {
+    "DEPLOY_TIME": "2026-04-09T12:51:05.990Z"
+  }
 }
