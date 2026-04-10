@@ -200,5 +200,6 @@ export function generateTemplate(): Uint8Array {
   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
   XLSX.utils.book_append_sheet(wb, ws2, 'Instructions');
 
-  return XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+  const result = XLSX.write(wb, { type: 'array', bookType: 'xlsx' }) as unknown as number[];
+  return new Uint8Array(result);
 }
