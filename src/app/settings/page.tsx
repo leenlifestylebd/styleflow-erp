@@ -25,10 +25,14 @@ export default function SettingsPage() {
   async function testAPI() {
     setTesting(true); setTestResult(null);
     try {
-      const res = await fetch('/api/v1/courier/balance');
+      const params = new URLSearchParams({
+        api_key: settings.sf_api_key,
+        secret_key: settings.sf_secret_key,
+      });
+      const res = await fetch('/api/v1/courier/balance?' + params.toString());
       const data = await res.json();
       if (data.current_balance !== undefined) setTestResult({ ok: true, msg: `✅ Connected! Balance: ৳${data.current_balance}` });
-      else setTestResult({ ok: false, msg: '❌ ' + (data.error || 'Connection failed') });
+      else setTestResult({ ok: false, msg: '❌ ' + (data.message || data.error || 'Connection failed') });
     } catch { setTestResult({ ok: false, msg: '❌ Connection failed' }); }
     setTesting(false);
   }
