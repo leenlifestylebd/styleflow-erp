@@ -1,20 +1,26 @@
-// src/app/api/v1/courier/balance/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { sfGetBalance } from '@/lib/utils/steadfast';
 
-export async function GET() {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function GET(req: NextRequest) {
+  // Get keys from query params (sent from client settings) or env vars
+  const { searchParams } = new URL(req.url);
+  const apiKey = searchParams.get('api_key') || process.env.STEADFAST_API_KEY || '';
+  const secretKey = searchParams.get('secret_key') || process.env.STEADFAST_SECRET_KEY || '';
 
-  const { data: staff } = await supabase.from('staff').select('tenant_id').eq('auth_user_id', user.id).single();
-  const { data: tenant } = await supabase.from('tenants').select('settings').eq('id', staff?.tenant_id).single();
-  const settings = (tenant?.settings || {}) as Record<string, string>;
+  if (!apiKey || !secretKey) {
+    return NextResponse.json({ error: 'API credentials not configured' }, { status: 400 });
+  }
 
-  const result = await sfGetBalance(
-    settings.sf_api_key || process.env.STEADFAST_API_KEY || '',
-    settings.sf_secret_key || process.env.STEADFAST_SECRET_KEY || ''
-  );
-  return NextResponse.json(result);
+  try {
+    const res = await fetch('https://portal.packzy.com/api/v1/get_balance', {
+      headers: {
+        'Api-Key': apiKey,
+        'Secret-Key': secretKey,
+        'Content-Type': 'application/json',
+      }
+    });
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch {
+    return NextResponse.json({ error: 'Connection failed' }, { status: 500 });
+  }
 }
