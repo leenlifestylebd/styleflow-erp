@@ -1,7 +1,9 @@
 // src/lib/stores/pos-store.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CartItem, PaymentEntry, Customer, Shift } from '@/types';
+import type { CartItem, PaymentEntry, Shift } from '@/types';
+
+interface Customer { id: string; name: string; phone?: string; email?: string; }
 
 interface POSStore {
   // Cart
