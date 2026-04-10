@@ -50,7 +50,7 @@ export default function ImportPage() {
   // ── Download template ──────────────────────────────────────────────────────
   function downloadTemplate() {
     const buf  = generateTemplate();
-    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const blob = new Blob([new Uint8Array(buf)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url  = URL.createObjectURL(blob);
     const a    = Object.assign(document.createElement('a'), { href: url, download: 'steadfast-import-template.xlsx' });
     a.click();
