@@ -1,14 +1,12 @@
 // src/lib/utils/steadfast.ts
 const BASE = 'https://portal.packzy.com/api/v1';
 
-interface SFHeaders {
-  'Api-Key': string;
-  'Secret-Key': string;
-  'Content-Type': string;
-}
-
-function getHeaders(apiKey: string, secretKey: string): SFHeaders {
-  return { 'Api-Key': apiKey, 'Secret-Key': secretKey, 'Content-Type': 'application/json' };
+function getHeaders(apiKey: string, secretKey: string): Record<string, string> {
+  return {
+    'Api-Key': apiKey,
+    'Secret-Key': secretKey,
+    'Content-Type': 'application/json',
+  };
 }
 
 export interface SFOrderPayload {
@@ -32,10 +30,8 @@ export async function sfCreateOrder(apiKey: string, secretKey: string, order: SF
 }
 
 export async function sfBulkCreate(apiKey: string, secretKey: string, orders: SFOrderPayload[]) {
-  // Steadfast takes JSON-encoded string in "data" key, max 500 per batch
   const chunks: SFOrderPayload[][] = [];
   for (let i = 0; i < orders.length; i += 500) chunks.push(orders.slice(i, i + 500));
-
   const results: unknown[] = [];
   for (const chunk of chunks) {
     const res = await fetch(`${BASE}/create_order/bulk-order`, {
@@ -78,9 +74,6 @@ export async function sfCreateReturn(apiKey: string, secretKey: string, data: {
 export const STEADFAST_STATUS_LABELS: Record<string, string> = {
   in_review: 'In Review',
   pending: 'Pending',
-  delivered_approval_pending: 'Delivered (Approval Pending)',
-  partial_delivered_approval_pending: 'Partial Delivered (Approval Pending)',
-  cancelled_approval_pending: 'Cancelled (Approval Pending)',
   delivered: 'Delivered',
   partial_delivered: 'Partial Delivered',
   cancelled: 'Cancelled',
